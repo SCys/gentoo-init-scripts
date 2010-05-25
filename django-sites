@@ -1,0 +1,91 @@
+#!/sbin/runscript
+
+### a config in /home/test/conf/django.conf:
+# site_user=test
+# site_group=nginx
+# site_path=/home/test/web/itest
+
+# site_sock=/home/test/web/itest/itest.sock
+# site_pid=/home/test/web/itest/itest.pid
+
+# site_python_path=/home/text/lib/python
+# site_ext="maxspre=2 minspare=1 maxchildren=10 maxrequests=500"
+
+opts="${opts} site_start site_stop site_restart"
+
+SITE_CONF_PATH="/home/wwwdev/conf"
+DEFAULT_SITE_USER="wwwdev"
+DEFAULT_SITE_GROUP="nginx"
+
+start() {
+  ebegin "Starting Django Sites"
+
+  for folder in $SITE_CONF_PATH; do
+    einfo "search config in $folder"
+    [ -d $folder ] || continue
+    
+    for conf in `find $folder -iname "*.conf" -type f`; do
+      site_start $conf
+    done
+  done
+}
+
+stop() {
+  ebegin "Stop Django Sites"
+
+  for folder in $SITE_CONF_PATH; do
+    [ -d $folder ] || continue
+    einfo "search config in $folder"
+
+    for conf in `find $folder -iname "*.conf" -type f`; do
+      site_stop $conf
+    done
+  done
+}
+
+# start single site
+site_start() {
+  if [ $# -lt 1 ]; then
+    echo "usage: django-sites site_start /your/site/config/path/to/setting.conf"
+
+    return 1
+  fi
+
+  . $1
+
+  # touch pid
+  [ -f $site_pid ] && ewarn "config $1 already running ($site_pid)" && continue
+
+  start-stop-daemon --start \
+    --user ${site_user:=$DEFAULT_SITE_USER} --group ${site_group:=$DEFAULT_SITE_GROUP} \
+    --exec /usr/bin/env -- \
+    PYTHONPATH="$site_python_path" python $site_path/manage.py runfcgi daemonize=true pidfile=$site_pid socket=$site_sock $site_ext
+  chmod a+rwx $site_sock
+
+  einfo "config: $1 started"
+
+  return 0
+}
+
+site_stop() {
+  if [ $# -lt 1 ]; then
+    echo "usage: django-sites site_stop /your/site/config/path/to/setting.conf"
+
+    return 1
+  fi
+
+  . $1
+
+  start-stop-daemon --stop --pidfile $site_pid
+  einfo "config: $1 stop"
+
+  [ -f $site_pid ] && rm $site_pid
+  [ -e $site_sock ] && rm $site_sock
+
+  return 0
+}
+
+site_restart() {
+  site_stop $@ \
+  && site_start $@
+}
