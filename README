@@ -1,0 +1,24 @@
+django sites gentoo init scripts
+
+# install 
+su -
+cp django-sites /etc/init.d
+
+# usage
+cd /path/to/django-site/
+touch django-init.conf
+vim /etc/init.d/django-sites
+
+  modify:
+    SITE_CONF_PATH="/path/to/django-site /other/path"
+    DEFAULT_SITE_USER="nginx" # other user your web server
+
+/etc/init.d/django-sites site_start /path/to/django-site/django-init.conf
+
+# actions 
+site_start   # single site action start
+site_restart # single site action restart
+site_stop    # single site action stop
+restart
+stop
+start
