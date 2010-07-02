@@ -11,6 +11,9 @@
 # site_python_path=/home/text/lib/python
 # site_ext="maxspre=2 minspare=1 maxchildren=10 maxrequests=500"
 
+# FIXME 
+# outside args not input
+
 opts="${opts} site_start site_stop site_restart"
 
 SITE_CONF_PATH="/home/wwwdev/conf"
