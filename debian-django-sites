@@ -84,9 +84,6 @@ site_restart() {
   && site_start $@
 }
 
-# Exit if the package is not installed
-#[ -x "$DAEMON" ] || exit 0
-
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
@@ -107,13 +104,6 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
-
-  log_daemon_msg "Starting Django Sites"
 
   for folder in $SITE_CONF_PATH; do
     log_daemon_msg "search config in $folder"
@@ -123,6 +113,8 @@ do_start()
       site_start $conf
     done
   done
+
+  return 0;
 }
 
 #
@@ -138,13 +130,6 @@ do_stop()
 	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
-	# Wait for children to finish too if this is a daemon that forks
-	# and if the daemon is only ever run from this initscript.
-	# If the above conditions are not satisfied then add some other code
-	# that waits for the process to drop all resources that could be
-	# needed by services started subsequently.  A last resort is to
-	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
   
   log_daemon_msg "Stop Django Sites"
 
