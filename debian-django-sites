@@ -1,4 +1,26 @@
-#!/sbin/runscript
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          skeleton
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.
+### END INIT INFO
+
+# Author: SCys <me@iscys.com>
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Description of the service"
+NAME=debian-django-sites
+DAEMON=/usr/sbin/$NAME
+DAEMON_ARGS="--options args"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
 
 ### a config in /home/test/conf/django.conf:
 # site_user=test
@@ -10,8 +32,6 @@
 
 # site_python_path=/home/text/lib/python
 # site_ext="maxspre=2 minspare=1 maxchildren=1 maxrequests=500"
-
-opts="site_start site_stop site_restart"
 
 SITE_CONF_PATH="/home/logan/sites/scripts"
 DEFAULT_SITE_USER="www-data"
@@ -64,36 +84,8 @@ site_restart() {
   && site_start $@
 }
 
-#! /bin/sh
-### BEGIN INIT INFO
-# Provides:          skeleton
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Example initscript
-# Description:       This file should be used to construct scripts to be
-#                    placed in /etc/init.d.
-### END INIT INFO
-
-# Author: Foo Bar <foobar@baz.org>
-#
-# Please remove the "Author" lines above and replace them
-# with your own name if you copy and modify this script.
-
-# Do NOT "set -e"
-
-# PATH should only include /usr/* if it runs after the mountnfs.sh script
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Description of the service"
-NAME=daemonexecutablename
-DAEMON=/usr/sbin/$NAME
-DAEMON_ARGS="--options args"
-PIDFILE=/var/run/$NAME.pid
-SCRIPTNAME=/etc/init.d/$NAME
-
 # Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
+#[ -x "$DAEMON" ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
